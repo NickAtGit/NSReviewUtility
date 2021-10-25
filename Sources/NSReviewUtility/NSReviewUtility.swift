@@ -6,7 +6,7 @@ public class NSReviewUtility {
     private let appLaunchKey = "appLaunches"
     private let happinessIndexKey = "happinessIndex"
     
-    private(set) var appLaunchCount: Int {
+    public private(set) var appLaunchCount: Int {
         get {
             UserDefaults.standard.value(forKey: appLaunchKey) as? Int ?? 0
         }
@@ -15,7 +15,7 @@ public class NSReviewUtility {
         }
     }
     
-    private(set) var happinessIndex: Int {
+    public private(set) var happinessIndex: Int {
         get {
             UserDefaults.standard.value(forKey: happinessIndexKey) as? Int ?? 0
         }
