@@ -39,4 +39,5 @@ To check the launchCount or happinessIndex you can call:
 To see the framework live in action:
 
 [NFC for iPhone on the AppStore](https://apps.apple.com/app/id1249686798)
+
 The app records when you successfully read a NFC tag or QR-code. When the happiness index reaches a mulitple of 3 the review view is triggered.
