@@ -30,3 +30,8 @@ When something bad happened:
     func somethingBadHappened() {
         AppDelegate.reviewUtility.resetHappiness()
     }
+    
+To check the launchCount or happinessIndex you can call:
+
+    AppDelegate.reviewUtility.launchCount
+    AppDelegate.reviewUtility.happinessIndex

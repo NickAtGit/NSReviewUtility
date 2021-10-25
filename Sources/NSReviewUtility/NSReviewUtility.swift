@@ -28,7 +28,7 @@ public class NSReviewUtility {
     private let happinessIndexModuloCheck: Int?
     
     public init(checkLaunchCountEvery: Int? = nil,
-         checkHappinessIndexEvery: Int? = nil) {
+                checkHappinessIndexEvery: Int? = nil) {
         self.appLaunchCountModuloCheck = checkLaunchCountEvery
         self.happinessIndexModuloCheck = checkHappinessIndexEvery
     }
