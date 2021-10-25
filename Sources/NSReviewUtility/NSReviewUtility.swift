@@ -1,7 +1,7 @@
 
 import StoreKit
 
-class NSReviewUtility {
+public class NSReviewUtility {
     
     private let appLaunchKey = "appLaunches"
     private let happinessIndexKey = "happinessIndex"
@@ -27,13 +27,13 @@ class NSReviewUtility {
     private let appLaunchCountModuloCheck: Int?
     private let happinessIndexModuloCheck: Int?
     
-    init(checkLaunchCountEvery: Int? = nil,
+    public init(checkLaunchCountEvery: Int? = nil,
          checkHappinessIndexEvery: Int? = nil) {
         self.appLaunchCountModuloCheck = checkLaunchCountEvery
         self.happinessIndexModuloCheck = checkHappinessIndexEvery
     }
     
-    func incrementAppLauch() {
+    public func incrementAppLauch() {
         appLaunchCount += 1
         
         if let appLaunchCountModuloCheck = appLaunchCountModuloCheck {
@@ -43,7 +43,7 @@ class NSReviewUtility {
         }
     }
     
-    func incrementHappiness() {
+    public func incrementHappiness() {
         happinessIndex += 1
         
         if let happinessIndexModuloCheck = happinessIndexModuloCheck {
@@ -53,11 +53,11 @@ class NSReviewUtility {
         }
     }
     
-    func decrementHappiness() {
+    public func decrementHappiness() {
         happinessIndex -= 1
     }
     
-    func resetHappiness() {
+    public func resetHappiness() {
         happinessIndex = 0
     }
         
