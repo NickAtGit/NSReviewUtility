@@ -73,6 +73,8 @@ extension SKStoreReviewController {
                 if let scene = UIApplication.shared.windows.first?.windowScene {
                     requestReview(in: scene)
                 }
+            } else {
+                SKStoreReviewController.requestReview()
             }
         }
     }

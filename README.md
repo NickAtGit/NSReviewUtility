@@ -25,7 +25,7 @@ When something positive happens in your app:
         AppDelegate.reviewUtility.incrementHappiness()
     }
     
-When something bad happened:
+When something negative happened:
     
     func somethingBadHappened() {
         AppDelegate.reviewUtility.resetHappiness()
