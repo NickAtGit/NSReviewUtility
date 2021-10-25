@@ -40,4 +40,4 @@ To see the framework live in action:
 
 [NFC for iPhone on the AppStore](https://apps.apple.com/app/id1249686798)
 
-The app records when you successfully read a NFC tag or QR-code. When the happiness index reaches a mulitple of 3 the review view is triggered.
+The app increments the happiness when you successfully read a NFC tag or QR-code. When the happiness index reaches a multiple of 3 the review view is triggered.
