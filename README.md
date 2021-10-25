@@ -8,7 +8,7 @@ Instatiate the NSReviewUtiltity in your AppDelegate. Both parameters are optiona
 
     static let reviewUtility = NSReviewUtility(checkLaunchCountEvery: 5, checkHappinessIndexEvery: 3)
 
-Then in `didFinishLaunchingWithOptions`
+Then in `AppDelegate.didFinishLaunchingWithOptions`
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -21,7 +21,7 @@ Then in `didFinishLaunchingWithOptions`
 When something positive happens in your app:
 
     func somethingGoodHappened() {
-        // Triggers SKStoreReviewController review view when happinessIndex % 5 == 0
+        // Triggers SKStoreReviewController review view when happinessIndex % 3 == 0
         AppDelegate.reviewUtility.incrementHappiness()
     }
     
