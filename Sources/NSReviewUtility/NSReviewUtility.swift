@@ -37,7 +37,8 @@ public class NSReviewUtility {
         appLaunchCount += 1
         
         if let appLaunchCountModuloCheck = appLaunchCountModuloCheck {
-            if appLaunchCount % appLaunchCountModuloCheck == 0 {
+            if appLaunchCount % appLaunchCountModuloCheck == 0,
+               happinessIndex > 0 {
                 showReviewIfNeeded()
             }
         }
