@@ -39,7 +39,7 @@ public class NSReviewUtility {
         if let appLaunchCountModuloCheck = appLaunchCountModuloCheck {
             if appLaunchCount % appLaunchCountModuloCheck == 0,
                happinessIndex > 0 {
-                showReviewIfNeeded()
+                askForReview()
             }
         }
     }
@@ -49,7 +49,7 @@ public class NSReviewUtility {
         
         if let happinessIndexModuloCheck = happinessIndexModuloCheck {
             if happinessIndex % happinessIndexModuloCheck == 0 {
-                showReviewIfNeeded()
+                askForReview()
             }
         }
     }
@@ -61,8 +61,8 @@ public class NSReviewUtility {
     public func resetHappiness() {
         happinessIndex = 0
     }
-        
-    private func showReviewIfNeeded() {
+    
+    public func askForReview() {
         SKStoreReviewController.requestReviewInCurrentScene()
     }
 }
