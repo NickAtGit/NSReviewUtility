@@ -3,7 +3,7 @@ import StoreKit
 
 public class NSReviewUtility {
     
-    static let shared = NSReviewUtility()
+    public static let shared = NSReviewUtility()
     private init() {}
     
     public private(set) var appLaunchCount: Int {
