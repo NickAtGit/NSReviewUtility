@@ -3,8 +3,8 @@ import StoreKit
 
 public class NSReviewUtility {
     
-    private let appLaunchKey = "appLaunches"
-    private let happinessIndexKey = "happinessIndex"
+    static let shared = NSReviewUtility()
+    private init() {}
     
     public private(set) var appLaunchCount: Int {
         get {
@@ -24,33 +24,26 @@ public class NSReviewUtility {
         }
     }
     
-    private let appLaunchCountModuloCheck: Int?
-    private let happinessIndexModuloCheck: Int?
+    public var appLaunchCheckCount = 3
+    public var happinessIndexCheckCount = 3
     
-    public init(checkLaunchCountEvery: Int? = nil,
-                checkHappinessIndexEvery: Int? = nil) {
-        self.appLaunchCountModuloCheck = checkLaunchCountEvery
-        self.happinessIndexModuloCheck = checkHappinessIndexEvery
-    }
+    private let appLaunchKey = "appLaunches"
+    private let happinessIndexKey = "happinessIndex"
     
     public func incrementAppLauch() {
         appLaunchCount += 1
         
-        if let appLaunchCountModuloCheck = appLaunchCountModuloCheck {
-            if appLaunchCount % appLaunchCountModuloCheck == 0,
-               happinessIndex > 0 {
-                askForReview()
-            }
+        if appLaunchCount % appLaunchCheckCount == 0,
+           happinessIndex > 0 {
+            askForReview()
         }
     }
     
     public func incrementHappiness() {
         happinessIndex += 1
         
-        if let happinessIndexModuloCheck = happinessIndexModuloCheck {
-            if happinessIndex % happinessIndexModuloCheck == 0 {
-                askForReview()
-            }
+        if happinessIndex % happinessIndexCheckCount == 0 {
+            askForReview()
         }
     }
     
