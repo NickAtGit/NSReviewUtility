@@ -26,7 +26,9 @@ public class NSReviewUtility {
     
     public var appLaunchCheckCount = 3
     public var happinessIndexCheckCount = 3
+    public var askForReviewOncePerSessionOnly = false
     
+    private var didAskForReview = false
     private let appLaunchKey = "appLaunches"
     private let happinessIndexKey = "happinessIndex"
     
@@ -56,7 +58,14 @@ public class NSReviewUtility {
     }
     
     public func askForReview() {
-        SKStoreReviewController.requestReviewInCurrentScene()
+        if askForReviewOncePerSessionOnly {
+            if !didAskForReview {
+                didAskForReview = true
+                SKStoreReviewController.requestReviewInCurrentScene()
+            }
+        } else {
+            SKStoreReviewController.requestReviewInCurrentScene()
+        }
     }
 }
 
