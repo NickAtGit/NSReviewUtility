@@ -6,11 +6,29 @@ public class NSReviewUtility {
     
     private let happinessIndexCheckCount: Int
     private let daysAfterFirstLaunchCheckCount: Int
-    private var loggingAdapter: ReviewUtilityLoggable?
+    private weak var loggingAdapter: ReviewUtilityLoggable?
     
+    private var canAskForReview = false {
+        didSet {
+            loggingAdapter?.log("⭐️ Can ask for review: \(canAskForReview)")
+        }
+    }
+
+    private var isDateDaysAfterFirstLaunchCheckCount: Bool {
+        if let firstLaunchDate {
+            let thresholdDate = firstLaunchDate.addingTimeInterval(TimeInterval(daysAfterFirstLaunchCheckCount * 60 * 60 * 24))
+            
+            let isCurrentDateGreaterThanThresholdDate = Date() > thresholdDate
+            loggingAdapter?.log("⭐️ Is current date greater than threshold date: \(isCurrentDateGreaterThanThresholdDate)")
+            return isCurrentDateGreaterThanThresholdDate
+        } else {
+            return false
+        }
+    }
+        
     public init(happinessIndexCheckCount: Int = 5,
-         daysAfterFirstLaunchCheckCount: Int = 7,
-         loggingAdapter: ReviewUtilityLoggable? = nil) {
+                daysAfterFirstLaunchCheckCount: Int = 3,
+                loggingAdapter: ReviewUtilityLoggable? = nil) {
         
         self.happinessIndexCheckCount = happinessIndexCheckCount
         self.daysAfterFirstLaunchCheckCount = daysAfterFirstLaunchCheckCount
@@ -22,7 +40,7 @@ public class NSReviewUtility {
             loggingAdapter?.log("⭐️ ReviewUtility started. First launched at \(formatter.string(from: firstLaunchDate))")
         } else {
             firstLaunchDate = Date()
-            loggingAdapter?.log("⭐️ ReviewUtility started for the first time. Setting frist launched date to now.")
+            loggingAdapter?.log("⭐️ ReviewUtility started for the first time. Setting first launched date to now.")
         }
         
         let askedForReviewThisYearCount = datesAskedForReview.filter { Calendar.current.isDateInThisYear($0) }.count
@@ -39,24 +57,6 @@ public class NSReviewUtility {
         }
     }
     
-    private var canAskForReview = false {
-        didSet {
-            loggingAdapter?.log("⭐️ Can ask for review: \(canAskForReview)")
-        }
-    }
-    private var didAskForReview = false
-    private var isDateDaysAfterFirstLaunchCheckCount: Bool {
-        if let firstLaunchDate {
-            let thresholdDate = firstLaunchDate.addingTimeInterval(TimeInterval(daysAfterFirstLaunchCheckCount * 60 * 60 * 24))
-            
-            let isCurrentDateGreaterThanThresholdDate = Date() > thresholdDate
-            loggingAdapter?.log("⭐️ Is current date greater than threshold date: \(isCurrentDateGreaterThanThresholdDate)")
-            return isCurrentDateGreaterThanThresholdDate
-        } else {
-            return false
-        }
-    }
-        
     public func incrementHappiness() {
         happinessIndex += 1
         loggingAdapter?.log("⭐️ Incremeting happiness, index is now: \(happinessIndex)")
@@ -148,7 +148,7 @@ extension Bundle {
     }
 }
 
-public protocol ReviewUtilityLoggable {
+public protocol ReviewUtilityLoggable: AnyObject {
     
     func log(_ message: String)
 }
