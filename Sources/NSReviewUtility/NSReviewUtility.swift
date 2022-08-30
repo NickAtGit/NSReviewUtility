@@ -4,11 +4,10 @@ import StoreKit
 @available(iOS 14.0, *)
 public class NSReviewUtility {
     
-    private let happinessIndexCheckCount: Int
-    private let daysAfterFirstLaunchCheckCount: Int
-    private weak var loggingAdapter: ReviewUtilityLoggable?
+    public var happinessIndexCheckCount: Int { didSet { evaluateCanAskForReview() } }
+    public var daysAfterFirstLaunchCheckCount: Int { didSet { evaluateCanAskForReview() } }
     
-    private var canAskForReview = false {
+    public private(set) var canAskForReview = false {
         didSet {
             loggingAdapter?.log("⭐️ Can ask for review: \(canAskForReview)")
         }
@@ -25,6 +24,8 @@ public class NSReviewUtility {
             return false
         }
     }
+    
+    private weak var loggingAdapter: ReviewUtilityLoggable?
         
     public init(happinessIndexCheckCount: Int = 5,
                 daysAfterFirstLaunchCheckCount: Int = 3,
@@ -37,12 +38,16 @@ public class NSReviewUtility {
         if let firstLaunchDate {
             let formatter = DateFormatter()
             formatter.dateStyle = .short
-            loggingAdapter?.log("⭐️ ReviewUtility started. First launched at \(formatter.string(from: firstLaunchDate))")
+            loggingAdapter?.log("⭐️ ReviewUtility started. First launched at \(formatter.string(from: firstLaunchDate)), happinessIndexCheckCount: \(happinessIndexCheckCount), daysAfterFirstLaunchCheckCount: \(daysAfterFirstLaunchCheckCount)")
         } else {
             firstLaunchDate = Date()
             loggingAdapter?.log("⭐️ ReviewUtility started for the first time. Setting first launched date to now.")
         }
         
+        evaluateCanAskForReview()
+    }
+    
+    private func evaluateCanAskForReview() {
         let askedForReviewThisYearCount = datesAskedForReview.filter { Calendar.current.isDateInThisYear($0) }.count
         let hasLessThanThreeReviewAttemptsThisYear = askedForReviewThisYearCount <= 3
         loggingAdapter?.log("⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review.")

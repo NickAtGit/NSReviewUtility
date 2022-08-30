@@ -4,32 +4,53 @@ NSReviewUtility is a package for counting the happiness of a user in your app. I
 
 ## Usage example
 
-Instatiate the NSReviewUtiltity in your AppDelegate. Both parameters are optional.:
+Create a adapter class in your project.:
 
-    static let reviewUtility = NSReviewUtility(happinessIndexCheckCount: 5, daysAfterFirstLaunchCheckCount: 3)
+    import NSReviewUtility
+    
+    class ReviewUtilityAdapter {
+        
+        let reviewUtility: NSReviewUtility
+        private static let reviewUtilityLoggingAdapter = ReviewUtilityLoggerAdapter()
+        
+        init() {
+            self.reviewUtility = NSReviewUtility(happinessIndexCheckCount: 5,
+                                                 daysAfterFirstLaunchCheckCount: 3,
+                                                 loggingAdapter: ReviewUtilityAdapter.reviewUtilityLoggingAdapter)
+        }
+    }
+    
+    class ReviewUtilityLoggerAdapter: ReviewUtilityLoggable {
+        func log(_ message: String) {
+            //Do your logging here
+        }
+    }
+    
+Put this as a free variable in your project:
+    let reviewUtility = ReviewUtilityAdapter().reviewUtility
 
 When something positive happens in your app:
 
     func somethingPositiveHappened() {
-        AppDelegate.reviewUtility.incrementHappiness()
+        reviewUtility.incrementHappiness()
     }
     
 When something negative happens in your app:
 
     func somethingNegativeHappened() {
-        AppDelegate.reviewUtility.decrementHappiness()
+        reviewUtility.decrementHappiness()
     }
 
 When something really bad happened:
     
     func somethingReallyBadHappened() {
-        AppDelegate.reviewUtility.resetHappiness()
+        reviewUtility.resetHappiness()
     }
     
 You can also ask for review when possible:
 
     func manuallyAskForReview() {
-        AppDelegate.reviewUtility.askForReview()
+        reviewUtility.askForReview()
     }
 
 To see this package live in action:
