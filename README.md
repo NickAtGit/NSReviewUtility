@@ -1,43 +1,37 @@
 # NSReviewUtility
 
-NSReviewUtility is a framework for counting app lauchnes and the happiness of a user in your app. It triggers the `SKStoreReviewController` review request when a certain condition happens.
+NSReviewUtility is a package for counting the happiness of a user in your app. It triggers the `SKStoreReviewController` review request when a certain condition happens. You can specify the `happinessIndexCheckCount` and the `daysAfterFirstLaunchCheckCount` to control when the `SKStoreReviewController` should appear at first. The package prevents asking for review when the dialogue already appeared on your current app version or you asked more than three times a year. The ideas for that are from this blog post [Increase App Ratings by using SKStoreReviewController](https://www.avanderlee.com/swift/skstorereviewcontroller-app-ratings/)
 
 ## Usage example
 
 Instatiate the NSReviewUtiltity in your AppDelegate. Both parameters are optional.:
 
-    static let reviewUtility = NSReviewUtility(checkLaunchCountEvery: 5, checkHappinessIndexEvery: 3)
-
-Then in `AppDelegate.didFinishLaunchingWithOptions`
-
-    func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-                     
-        // Triggers SKStoreReviewController review view when launchCount % 5 == 0
-        AppDelegate.reviewUtility.incrementAppLauch()
-        return true
-    }
+    static let reviewUtility = NSReviewUtility(happinessIndexCheckCount: 5, daysAfterFirstLaunchCheckCount: 3)
 
 When something positive happens in your app:
 
-    func somethingGoodHappened() {
-        // Triggers SKStoreReviewController review view when happinessIndex % 3 == 0
+    func somethingPositiveHappened() {
         AppDelegate.reviewUtility.incrementHappiness()
     }
     
-When something negative happened:
+When something negative happens in your app:
+
+    func somethingNegativeHappened() {
+        AppDelegate.reviewUtility.decrementHappiness()
+    }
+
+When something really bad happened:
     
-    func somethingBadHappened() {
+    func somethingReallyBadHappened() {
         AppDelegate.reviewUtility.resetHappiness()
     }
     
-To check the launchCount or happinessIndex you can call:
+You can also ask for review when possible:
 
-    AppDelegate.reviewUtility.launchCount
-    AppDelegate.reviewUtility.happinessIndex
+    func manuallyAskForReview() {
+        AppDelegate.reviewUtility.askForReview()
+    }
 
-To see the framework live in action:
+To see this package live in action:
 
-[NFC for iPhone on the AppStore](https://apps.apple.com/app/id1249686798)
-
-The app increments the happiness when you successfully read a NFC tag or QR-code. When the happiness index reaches a multiple of 3 the review view is triggered.
+[NFC・QR Code・Document Scanner on the AppStore](https://apps.apple.com/app/id1249686798)
