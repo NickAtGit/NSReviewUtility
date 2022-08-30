@@ -8,7 +8,7 @@ public class NSReviewUtility {
     private let daysAfterFirstLaunchCheckCount: Int
     private var loggingAdapter: ReviewUtilityLoggable?
     
-    init(happinessIndexCheckCount: Int = 5,
+    public init(happinessIndexCheckCount: Int = 5,
          daysAfterFirstLaunchCheckCount: Int = 7,
          loggingAdapter: ReviewUtilityLoggable? = nil) {
         
