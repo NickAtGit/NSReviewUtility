@@ -45,7 +45,7 @@ public class NSReviewUtility: ObservableObject {
         let hasLessThanThreeReviewAttemptsThisYear = askedForReviewThisYearCount <= 3
         var logString = "⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review."
 
-        let isUserHappy = happinessIndex >= happinessIndexCheckCount
+        let isUserHappy = happinessIndex % happinessIndexCheckCount == 0
         
         if let versionLastAskedForReview,
            let currentVersion = Bundle.main.releaseVersionNumber {
@@ -64,10 +64,6 @@ public class NSReviewUtility: ObservableObject {
         happinessIndex += 1
         loggingAdapter?.log("⭐️ Incremeting happiness, index is now: \(happinessIndex)")
         evaluateCanAskForReview()
-        
-        if canAskForReview {
-            askForReview()
-        }
     }
     
     public func decrementHappiness() {
