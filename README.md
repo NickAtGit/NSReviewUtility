@@ -27,6 +27,7 @@ Create a adapter class in your project.:
     }
     
 Put this as a free variable in your project:
+    
     let reviewUtility = ReviewUtilityAdapter().reviewUtility
 
 When something positive happens in your app:

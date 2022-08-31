@@ -102,6 +102,7 @@ public class NSReviewUtility {
         firstLaunchDate = nil
         happinessIndex = 0
         versionLastAskedForReview = nil
+        loggingAdapter?.log("⭐️ Clearing all data")
     }
 }
 
@@ -149,16 +150,9 @@ extension NSReviewUtility {
 extension SKStoreReviewController {
     public static func askForReview() {
         DispatchQueue.main.async {
-            guard let scene = UIApplication.shared.foregroundActiveScene else { return }
-            SKStoreReviewController.requestReview(in: scene)
+            guard let scene = UIApplication.shared.windows.first?.windowScene else { return }
+            requestReview(in: scene)
         }
-    }
-}
-
-extension UIApplication {
-    var foregroundActiveScene: UIWindowScene? {
-        connectedScenes
-            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
     }
 }
 
