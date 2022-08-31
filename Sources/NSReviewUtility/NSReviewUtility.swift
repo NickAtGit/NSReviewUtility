@@ -6,8 +6,8 @@ public class NSReviewUtility: ObservableObject {
 
     @Published public private(set) var canAskForReview = false
     
-    public var happinessIndexCheckCount: Int { didSet { evaluateCanAskForReview() } }
-    public var daysAfterFirstLaunchCheckCount: Int { didSet { evaluateCanAskForReview() } }
+    public var happinessIndexCheckCount = 5 { didSet { evaluateCanAskForReview() } }
+    public var daysAfterFirstLaunchCheckCount = 3 { didSet { evaluateCanAskForReview() } }
 
     private var isDateDaysAfterFirstLaunchCheckCount: Bool {
         if let firstLaunchDate {
@@ -19,18 +19,11 @@ public class NSReviewUtility: ObservableObject {
     }
     
     private weak var loggingAdapter: ReviewUtilityLoggable?
-        
-    public init(happinessIndexCheckCount: Int = 5,
-                daysAfterFirstLaunchCheckCount: Int = 3,
-                loggingAdapter: ReviewUtilityLoggable? = nil) {
-        
-        self.happinessIndexCheckCount = happinessIndexCheckCount
-        self.daysAfterFirstLaunchCheckCount = daysAfterFirstLaunchCheckCount
-        self.loggingAdapter = loggingAdapter
-        
+            
+    public func start() {
         if let firstLaunchDate {
             let formatter = DateFormatter()
-            formatter.dateStyle = .short
+            formatter.dateStyle = .long
             loggingAdapter?.log("⭐️ ReviewUtility started. First launched at \(formatter.string(from: firstLaunchDate)), happinessIndexCheckCount: \(happinessIndexCheckCount), daysAfterFirstLaunchCheckCount: \(daysAfterFirstLaunchCheckCount)")
         } else {
             firstLaunchDate = Date()
@@ -38,6 +31,10 @@ public class NSReviewUtility: ObservableObject {
         }
         
         evaluateCanAskForReview()
+    }
+    
+    public func setLoggingAdapter(_ loggingAdapter: ReviewUtilityLoggable) {
+        self.loggingAdapter = loggingAdapter
     }
     
     private func evaluateCanAskForReview() {
