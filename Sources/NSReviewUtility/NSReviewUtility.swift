@@ -49,7 +49,7 @@ public class NSReviewUtility: ObservableObject {
         if let versionLastAskedForReview,
            let currentVersion = Bundle.main.releaseVersionNumber {
             let versionNotMatching = versionLastAskedForReview != currentVersion
-            logString += " Asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)."
+            logString += " Asked for review at version: \(versionLastAskedForReview), current version is: \(currentVersion)."
             DispatchQueue.main.async {
                 self.canAskForReview = versionNotMatching && self.isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
             }
@@ -86,6 +86,7 @@ public class NSReviewUtility: ObservableObject {
             self?.datesAskedForReview.append(Date())
             self?.versionLastAskedForReview = Bundle.main.releaseVersionNumber
             SKStoreReviewController.askForReview()
+            self?.canAskForReview = false
         }
         
         if force {
