@@ -16,10 +16,7 @@ public class NSReviewUtility {
     private var isDateDaysAfterFirstLaunchCheckCount: Bool {
         if let firstLaunchDate {
             let thresholdDate = firstLaunchDate.addingTimeInterval(TimeInterval(daysAfterFirstLaunchCheckCount * 60 * 60 * 24))
-            
-            let isCurrentDateGreaterThanThresholdDate = Date() > thresholdDate
-            loggingAdapter?.log("⭐️ Is current date greater than threshold date: \(isCurrentDateGreaterThanThresholdDate)")
-            return isCurrentDateGreaterThanThresholdDate
+            return Date() > thresholdDate
         } else {
             return false
         }
@@ -50,16 +47,18 @@ public class NSReviewUtility {
     private func evaluateCanAskForReview() {
         let askedForReviewThisYearCount = datesAskedForReview.filter { Calendar.current.isDateInThisYear($0) }.count
         let hasLessThanThreeReviewAttemptsThisYear = askedForReviewThisYearCount <= 3
-        loggingAdapter?.log("⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review.")
+        var logString = "⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review."
 
         if let versionLastAskedForReview,
            let currentVersion = Bundle.main.releaseVersionNumber {
             let versionNotMatching = versionLastAskedForReview != currentVersion
-            loggingAdapter?.log("⭐️ Asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)")
+            logString += " ReviewUtility asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)"
             canAskForReview = versionNotMatching && isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear
         } else {
+            logString += " ⭐️ Is current date greater than threshold date: \(isDateDaysAfterFirstLaunchCheckCount)"
             canAskForReview = isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear
         }
+        loggingAdapter?.log(logString)
     }
     
     public func incrementHappiness() {
