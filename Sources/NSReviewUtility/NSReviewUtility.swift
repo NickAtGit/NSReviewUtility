@@ -2,12 +2,12 @@
 import StoreKit
 
 @available(iOS 14.0, *)
-public class NSReviewUtility {
+public class NSReviewUtility: ObservableObject {
+
+    @Published public private(set) var canAskForReview = false
     
     public var happinessIndexCheckCount: Int { didSet { evaluateCanAskForReview() } }
     public var daysAfterFirstLaunchCheckCount: Int { didSet { evaluateCanAskForReview() } }
-    
-    public private(set) var canAskForReview = false
 
     private var isDateDaysAfterFirstLaunchCheckCount: Bool {
         if let firstLaunchDate {
