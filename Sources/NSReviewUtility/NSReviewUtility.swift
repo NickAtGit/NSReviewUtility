@@ -45,7 +45,7 @@ public class NSReviewUtility: ObservableObject {
         let hasLessThanThreeReviewAttemptsThisYear = askedForReviewThisYearCount <= 3
         var logString = "⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review."
 
-        let isUserHappy = happinessIndex != 0 && happinessIndex % happinessIndexCheckCount == 0
+        let isUserHappy = happinessIndex != 0 && (happinessIndex % happinessIndexCheckCount == 0)
         
         if let versionLastAskedForReview,
            let currentVersion = Bundle.main.releaseVersionNumber {
