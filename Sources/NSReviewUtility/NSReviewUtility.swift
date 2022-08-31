@@ -40,28 +40,26 @@ public class NSReviewUtility: ObservableObject {
     }
     
     private func evaluateCanAskForReview() {
-        let askedForReviewThisYearCount = datesAskedForReview.filter { Calendar.current.isDateInThisYear($0) }.count
-        let hasLessThanThreeReviewAttemptsThisYear = askedForReviewThisYearCount <= 3
-        var logString = "⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review."
-        
-        // max(1, happinessIndexCheckCount) prevents division by zero
-        let isUserHappy = happinessIndex != 0 && (happinessIndex % max(1, happinessIndexCheckCount) == 0)
-        
-        if let versionLastAskedForReview,
-           let currentVersion = Bundle.main.releaseVersionNumber {
-            let versionNotMatching = versionLastAskedForReview != currentVersion
-            logString += " Asked for review at version: \(versionLastAskedForReview), current version is: \(currentVersion)."
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            let askedForReviewThisYearCount = self.datesAskedForReview.filter { Calendar.current.isDateInThisYear($0) }.count
+            let hasLessThanThreeReviewAttemptsThisYear = askedForReviewThisYearCount <= 3
+            var logString = "⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review."
+            
+            // max(1, happinessIndexCheckCount) prevents division by zero
+            let isUserHappy = self.happinessIndex != 0 && (self.happinessIndex % max(1, self.happinessIndexCheckCount) == 0)
+            
+            if let versionLastAskedForReview = self.versionLastAskedForReview,
+               let currentVersion = Bundle.main.releaseVersionNumber {
+                let versionNotMatching = versionLastAskedForReview != currentVersion
+                logString += " Asked for review at version: \(versionLastAskedForReview), current version is: \(currentVersion)."
                 self.canAskForReview = versionNotMatching && self.isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
-            }
-        } else {
-            logString += " currentDate > thresholdDate: \(isDateDaysAfterFirstLaunchCheckCount)."
-            DispatchQueue.main.async {
+            } else {
+                logString += " currentDate > thresholdDate: \(self.isDateDaysAfterFirstLaunchCheckCount)."
                 self.canAskForReview = self.isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
             }
+            logString += " Can ask for review: \(self.canAskForReview)"
+            self.loggingAdapter?.log(logString)
         }
-        logString += " Can ask for review: \(canAskForReview)"
-        loggingAdapter?.log(logString)
     }
     
     public func incrementHappiness() {
