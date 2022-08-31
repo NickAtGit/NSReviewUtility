@@ -100,7 +100,7 @@ public class NSReviewUtility: ObservableObject {
     
     public func clearAllData() {
         datesAskedForReview = []
-        firstLaunchDate = nil
+        firstLaunchDate = Date()
         happinessIndex = 0
         versionLastAskedForReview = nil
         loggingAdapter?.log("⭐️ Clearing all data")
