@@ -19,7 +19,9 @@ public class NSReviewUtility: ObservableObject {
     }
     
     private weak var loggingAdapter: ReviewUtilityLoggable?
-            
+       
+    public init() {}
+    
     public func start() {
         if let firstLaunchDate {
             let formatter = DateFormatter()
