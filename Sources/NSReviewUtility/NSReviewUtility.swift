@@ -50,7 +50,7 @@ public class NSReviewUtility {
         if let versionLastAskedForReview,
            let currentVersion = Bundle.main.releaseVersionNumber {
             let versionNotMatching = versionLastAskedForReview != currentVersion
-            logString += " Asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)"
+            logString += " Asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)."
             canAskForReview = versionNotMatching && isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
         } else {
             logString += " currentDate > thresholdDate: \(isDateDaysAfterFirstLaunchCheckCount)."
