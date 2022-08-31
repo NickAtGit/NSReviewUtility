@@ -43,8 +43,9 @@ public class NSReviewUtility: ObservableObject {
         let askedForReviewThisYearCount = datesAskedForReview.filter { Calendar.current.isDateInThisYear($0) }.count
         let hasLessThanThreeReviewAttemptsThisYear = askedForReviewThisYearCount <= 3
         var logString = "⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review."
-
-        let isUserHappy = happinessIndex != 0 && (happinessIndex % happinessIndexCheckCount == 0)
+        
+        // max(1, happinessIndexCheckCount) prevents division by zero
+        let isUserHappy = happinessIndex != 0 && (happinessIndex % max(1, happinessIndexCheckCount) == 0)
         
         if let versionLastAskedForReview,
            let currentVersion = Bundle.main.releaseVersionNumber {
