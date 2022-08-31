@@ -18,6 +18,7 @@ public class NSReviewUtility: ObservableObject {
         }
     }
     
+    private var didAskForReviewInThisVersion: Bool { versionLastAskedForReview == Bundle.main.releaseVersionNumber }
     private weak var loggingAdapter: ReviewUtilityLoggable?
        
     public init() {}
@@ -48,11 +49,9 @@ public class NSReviewUtility: ObservableObject {
             // max(1, happinessIndexCheckCount) prevents division by zero
             let isUserHappy = self.happinessIndex != 0 && (self.happinessIndex % max(1, self.happinessIndexCheckCount) == 0)
             
-            if let versionLastAskedForReview = self.versionLastAskedForReview,
-               let currentVersion = Bundle.main.releaseVersionNumber {
-                let versionNotMatching = versionLastAskedForReview != currentVersion
-                logString += " Asked for review at version: \(versionLastAskedForReview), current version is: \(currentVersion)."
-                self.canAskForReview = versionNotMatching && self.isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
+            if self.didAskForReviewInThisVersion {
+                logString += " Asked for review at version: \(self.versionLastAskedForReview), current version is: \(Bundle.main.releaseVersionNumber)."
+                self.canAskForReview = false
             } else {
                 logString += " currentDate > thresholdDate: \(self.isDateDaysAfterFirstLaunchCheckCount)."
                 self.canAskForReview = self.isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
@@ -88,7 +87,9 @@ public class NSReviewUtility: ObservableObject {
             self?.canAskForReview = false
         }
         
-        if force {
+        if force && didAskForReviewInThisVersion {
+            loggingAdapter?.log("⭐️ Can not force ask for review. Already asked for review in this version.")
+        } else if force && !didAskForReviewInThisVersion {
             askForReviewClosure()
         } else if canAskForReview {
             askForReviewClosure()
@@ -101,7 +102,7 @@ public class NSReviewUtility: ObservableObject {
         datesAskedForReview = []
         firstLaunchDate = Date()
         happinessIndex = 0
-        versionLastAskedForReview = nil
+        versionLastAskedForReview = "not asked yet"
         loggingAdapter?.log("⭐️ Clearing all data")
     }
 }
@@ -136,9 +137,9 @@ extension NSReviewUtility {
         }
     }
     
-    public private(set) var versionLastAskedForReview: String? {
+    public private(set) var versionLastAskedForReview: String {
         get {
-            UserDefaults.standard.string(forKey: "versionLastAskedForReview")
+            UserDefaults.standard.string(forKey: "versionLastAskedForReview") ?? "not asked yet"
         }
         set {
             UserDefaults.standard.set(newValue, forKey: "versionLastAskedForReview")
@@ -157,8 +158,8 @@ extension SKStoreReviewController {
 }
 
 extension Bundle {
-    var releaseVersionNumber: String? {
-        return infoDictionary?["CFBundleShortVersionString"] as? String
+    var releaseVersionNumber: String {
+        return infoDictionary?["CFBundleShortVersionString"] as? String ?? "no version in plist"
     }
 }
 
