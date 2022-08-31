@@ -51,10 +51,14 @@ public class NSReviewUtility: ObservableObject {
            let currentVersion = Bundle.main.releaseVersionNumber {
             let versionNotMatching = versionLastAskedForReview != currentVersion
             logString += " Asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)."
-            canAskForReview = versionNotMatching && isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
+            DispatchQueue.main.async {
+                self.canAskForReview = versionNotMatching && self.isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
+            }
         } else {
             logString += " currentDate > thresholdDate: \(isDateDaysAfterFirstLaunchCheckCount)."
-            canAskForReview = isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
+            DispatchQueue.main.async {
+                self.canAskForReview = self.isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
+            }
         }
         logString += " Can ask for review: \(canAskForReview)"
         loggingAdapter?.log(logString)
