@@ -7,11 +7,7 @@ public class NSReviewUtility {
     public var happinessIndexCheckCount: Int { didSet { evaluateCanAskForReview() } }
     public var daysAfterFirstLaunchCheckCount: Int { didSet { evaluateCanAskForReview() } }
     
-    public private(set) var canAskForReview = false {
-        didSet {
-            loggingAdapter?.log("⭐️ Can ask for review: \(canAskForReview)")
-        }
-    }
+    public private(set) var canAskForReview = false
 
     private var isDateDaysAfterFirstLaunchCheckCount: Bool {
         if let firstLaunchDate {
@@ -52,12 +48,13 @@ public class NSReviewUtility {
         if let versionLastAskedForReview,
            let currentVersion = Bundle.main.releaseVersionNumber {
             let versionNotMatching = versionLastAskedForReview != currentVersion
-            logString += " ReviewUtility asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)"
+            logString += " Asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)"
             canAskForReview = versionNotMatching && isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear
         } else {
-            logString += " ⭐️ Is current date greater than threshold date: \(isDateDaysAfterFirstLaunchCheckCount)"
+            logString += " currentDate > thresholdDate: \(isDateDaysAfterFirstLaunchCheckCount)."
             canAskForReview = isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear
         }
+        logString += " Can ask for review: \(canAskForReview)"
         loggingAdapter?.log(logString)
     }
     
