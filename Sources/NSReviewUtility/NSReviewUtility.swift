@@ -85,6 +85,7 @@ public class NSReviewUtility {
         let askForReviewClosure = { [weak self] in
             self?.loggingAdapter?.log("⭐️ Asking for review now")
             self?.datesAskedForReview.append(Date())
+            self?.versionLastAskedForReview = Bundle.main.releaseVersionNumber
             SKStoreReviewController.askForReview()
         }
         
