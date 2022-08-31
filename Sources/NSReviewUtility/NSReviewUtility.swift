@@ -45,14 +45,16 @@ public class NSReviewUtility {
         let hasLessThanThreeReviewAttemptsThisYear = askedForReviewThisYearCount <= 3
         var logString = "⭐️ ReviewUtility asked \(askedForReviewThisYearCount) times this year for a review."
 
+        let isUserHappy = happinessIndex >= happinessIndexCheckCount
+        
         if let versionLastAskedForReview,
            let currentVersion = Bundle.main.releaseVersionNumber {
             let versionNotMatching = versionLastAskedForReview != currentVersion
             logString += " Asked for rating at version: \(versionLastAskedForReview), current version is: \(currentVersion)"
-            canAskForReview = versionNotMatching && isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear
+            canAskForReview = versionNotMatching && isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
         } else {
             logString += " currentDate > thresholdDate: \(isDateDaysAfterFirstLaunchCheckCount)."
-            canAskForReview = isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear
+            canAskForReview = isDateDaysAfterFirstLaunchCheckCount && hasLessThanThreeReviewAttemptsThisYear && isUserHappy
         }
         logString += " Can ask for review: \(canAskForReview)"
         loggingAdapter?.log(logString)
@@ -61,8 +63,9 @@ public class NSReviewUtility {
     public func incrementHappiness() {
         happinessIndex += 1
         loggingAdapter?.log("⭐️ Incremeting happiness, index is now: \(happinessIndex)")
-
-        if canAskForReview && happinessIndex >= happinessIndexCheckCount {
+        evaluateCanAskForReview()
+        
+        if canAskForReview {
             askForReview()
         }
     }
@@ -77,12 +80,28 @@ public class NSReviewUtility {
         loggingAdapter?.log("⭐️ Resetting happiness, index is now: \(happinessIndex)")
     }
     
-    public func askForReview() {
-        if canAskForReview {
-            loggingAdapter?.log("⭐️ Asking for review now")
-            datesAskedForReview.append(Date())
+    public func askForReview(force: Bool = false) {
+        
+        let askForReviewClosure = { [weak self] in
+            self?.loggingAdapter?.log("⭐️ Asking for review now")
+            self?.datesAskedForReview.append(Date())
             SKStoreReviewController.askForReview()
         }
+        
+        if force {
+            askForReviewClosure()
+        } else if canAskForReview {
+            askForReviewClosure()
+        } else {
+            loggingAdapter?.log("⭐️ Can not ask for review")
+        }
+    }
+    
+    public func clearAllData() {
+        datesAskedForReview = []
+        firstLaunchDate = nil
+        happinessIndex = 0
+        versionLastAskedForReview = nil
     }
 }
 
