@@ -18,7 +18,8 @@ public class NSReviewUtility: ObservableObject {
         }
     }
     
-    private var didAskForReviewInThisVersion: Bool { versionLastAskedForReview == Bundle.main.releaseVersionNumber }
+    private var currentVersion = Bundle.main.releaseVersionNumber + "-" + Bundle.main.buildVersionNumber
+    private var didAskForReviewInThisVersion: Bool { versionLastAskedForReview == currentVersion }
     private weak var loggingAdapter: ReviewUtilityLoggable?
        
     public init() {}
@@ -84,11 +85,15 @@ public class NSReviewUtility: ObservableObject {
     public func askForReview(force: Bool = false) {
         
         let askForReviewClosure = { [weak self] in
-            self?.loggingAdapter?.log("⭐️ Asking for review now")
-            self?.datesAskedForReview.append(Date())
-            self?.versionLastAskedForReview = Bundle.main.releaseVersionNumber
+            guard let self else { return }
+            // Only save when in production
+            if UIApplication.shared.isRunningInAppStoreEnvironment {
+                self.datesAskedForReview.append(Date())
+                self.versionLastAskedForReview = self.currentVersion
+            }
             SKStoreReviewController.askForReview()
-            self?.canAskForReview = false
+            self.loggingAdapter?.log("⭐️ Asked for review now")
+            self.canAskForReview = false
         }
         
         if force && didAskForReviewInThisVersion {
@@ -155,15 +160,26 @@ extension NSReviewUtility {
 extension SKStoreReviewController {
     public static func askForReview() {
         DispatchQueue.main.async {
-            guard let scene = UIApplication.shared.windows.first?.windowScene else { return }
-            requestReview(in: scene)
+            guard let scene = UIApplication.shared.foregroundActiveScene else { return }
+            SKStoreReviewController.requestReview(in: scene)
         }
+    }
+}
+
+extension UIApplication {
+    var foregroundActiveScene: UIWindowScene? {
+        connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
     }
 }
 
 extension Bundle {
     var releaseVersionNumber: String {
-        return infoDictionary?["CFBundleShortVersionString"] as? String ?? "no version in plist"
+        return infoDictionary?["CFBundleShortVersionString"] as? String ?? "no version number in plist"
+    }
+    
+    var buildVersionNumber: String {
+        return infoDictionary?["CFBundleVersion"] as? String ?? "no build number in plist"
     }
 }
 
@@ -177,5 +193,61 @@ extension Calendar {
     
     func isDateInThisYear(_ date: Date) -> Bool {
         return isDate(date, equalTo: currentDate, toGranularity: .year)
+    }
+}
+
+extension UIApplication {
+    
+    var isRunningInTestFlightEnvironment: Bool {
+        if isSimulator {
+            return false
+        } else {
+            if isAppStoreReceiptSandbox && !hasEmbeddedMobileProvision {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+    
+    var isRunningInAppStoreEnvironment: Bool {
+        if isSimulator {
+            return false
+        } else {
+            if isAppStoreReceiptSandbox || hasEmbeddedMobileProvision {
+                return false
+            } else {
+                return true
+            }
+        }
+    }
+
+    private var hasEmbeddedMobileProvision: Bool {
+        guard Bundle.main.path(forResource: "embedded", ofType: "mobileprovision") == nil else {
+            return true
+        }
+        return false
+    }
+    
+    private var isAppStoreReceiptSandbox: Bool {
+        if isSimulator {
+            return false
+        } else {
+            guard let url = Bundle.main.appStoreReceiptURL else {
+                return false
+            }
+            guard url.lastPathComponent == "sandboxReceipt" else {
+                return false
+            }
+            return true
+        }
+    }
+    
+    private var isSimulator: Bool {
+        #if arch(i386) || arch(x86_64)
+        return true
+        #else
+        return false
+        #endif
     }
 }

@@ -1,6 +1,6 @@
 # NSReviewUtility
 
-NSReviewUtility is a package for counting the happiness of a user in your app. It triggers the `SKStoreReviewController` review request when a certain condition happens. You can specify the `happinessIndexCheckCount` and the `daysAfterFirstLaunchCheckCount` to control when the `SKStoreReviewController` should appear at first. The package prevents asking for review when the dialogue already appeared on your current app version or you asked more than three times a year. The ideas for that are from this blog post [Increase App Ratings by using SKStoreReviewController](https://www.avanderlee.com/swift/skstorereviewcontroller-app-ratings/)
+NSReviewUtility is a package for counting the happiness of a user in your app. It triggers the `SKStoreReviewController` review request when a certain condition happens. You can specify the `happinessIndexCheckCount` and the `daysAfterFirstLaunchCheckCount` to control when the `SKStoreReviewController` should appear at first. The package prevents asking for review when the dialogue already appeared on your current app version or you asked more than three times a year. The ideas for that are from this blog post: [Increase App Ratings by using SKStoreReviewController](https://www.avanderlee.com/swift/skstorereviewcontroller-app-ratings/)
 
 ## Usage example
 
