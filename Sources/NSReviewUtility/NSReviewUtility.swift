@@ -68,8 +68,12 @@ public class NSReviewUtility: ObservableObject {
     }
     
     public func decrementHappiness() {
-        happinessIndex -= 1
-        loggingAdapter?.log("⭐️ Decremeting happiness, index is now: \(happinessIndex)")
+        if happinessIndex > 0 {
+            happinessIndex -= 1
+            loggingAdapter?.log("⭐️ Decremeting happiness, index is now: \(happinessIndex)")
+        } else {
+            loggingAdapter?.log("⭐️ Can not decrement happiness because it is already \(happinessIndex)")
+        }
     }
     
     public func resetHappiness() {
