@@ -83,17 +83,14 @@ public class NSReviewUtility: ObservableObject {
     }
     
     public func askForReview(force: Bool = false) {
-        
         let askForReviewClosure = { [weak self] in
             guard let self else { return }
             // Only save when in production
             if UIApplication.shared.isRunningInAppStoreEnvironment {
-                self.datesAskedForReview.append(Date())
-                self.versionLastAskedForReview = self.currentVersion
+                self.recordAskForReview()
             }
             SKStoreReviewController.askForReview()
             self.loggingAdapter?.log("⭐️ Asked for review now")
-            self.canAskForReview = false
         }
         
         if force && didAskForReviewInThisVersion {
@@ -105,6 +102,13 @@ public class NSReviewUtility: ObservableObject {
         } else {
             loggingAdapter?.log("⭐️ Can not ask for review")
         }
+    }
+    
+    public func recordAskForReview() {
+        datesAskedForReview.append(Date())
+        versionLastAskedForReview = currentVersion
+        canAskForReview = false
+        loggingAdapter?.log("⭐️ Recorded review request")
     }
     
     public func clearAllData() {
