@@ -10,7 +10,7 @@ public class NSReviewUtility: ObservableObject {
     public var daysAfterFirstLaunchCheckCount = 3 { didSet { evaluateCanAskForReview() } }
 
     private var isDateDaysAfterFirstLaunchCheckCount: Bool {
-        if let firstLaunchDate {
+        if let firstLaunchDate = firstLaunchDate {
             let thresholdDate = firstLaunchDate.addingTimeInterval(TimeInterval(daysAfterFirstLaunchCheckCount * 60 * 60 * 24))
             return Date() > thresholdDate
         } else {
@@ -25,7 +25,7 @@ public class NSReviewUtility: ObservableObject {
     public init() {}
     
     public func start() {
-        if let firstLaunchDate {
+        if let firstLaunchDate = firstLaunchDate {
             let formatter = DateFormatter()
             formatter.dateStyle = .long
             loggingAdapter?.log("⭐️ ReviewUtility started. First launched at \(formatter.string(from: firstLaunchDate)), happinessIndexCheckCount: \(happinessIndexCheckCount), daysAfterFirstLaunchCheckCount: \(daysAfterFirstLaunchCheckCount)")
@@ -84,7 +84,7 @@ public class NSReviewUtility: ObservableObject {
     
     public func askForReview(force: Bool = false) {
         let askForReviewClosure = { [weak self] in
-            guard let self else { return }
+            guard let self = self else { return }
             // Only save when in production
             if UIApplication.shared.isRunningInAppStoreEnvironment {
                 self.recordAskForReview()
