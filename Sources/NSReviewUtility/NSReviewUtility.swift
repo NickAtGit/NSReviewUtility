@@ -1,9 +1,12 @@
-
 import StoreKit
 
-@available(iOS 14.0, *)
-public class NSReviewUtility: ObservableObject {
+#if os(iOS)
+typealias Application = UIApplication
+#else
+typealias Application = NSApplication
+#endif
 
+public class NSReviewUtility: ObservableObject {
     @Published public private(set) var canAskForReview = false
     
     public var happinessIndexCheckCount = 5 { didSet { evaluateCanAskForReview() } }
@@ -86,7 +89,7 @@ public class NSReviewUtility: ObservableObject {
         let askForReviewClosure = { [weak self] in
             guard let self = self else { return }
             // Only save when in production
-            if UIApplication.shared.isRunningInAppStoreEnvironment {
+            if Application.shared.isRunningInAppStoreEnvironment {
                 self.recordAskForReview()
             }
             SKStoreReviewController.askForReview()
@@ -120,9 +123,7 @@ public class NSReviewUtility: ObservableObject {
     }
 }
 
-@available(iOS 14.0, *)
 extension NSReviewUtility {
-    
     public private(set) var datesAskedForReview: [Date] {
         get {
             UserDefaults.standard.value(forKey: "datesAskedForReview") as? [Date] ?? []
@@ -160,22 +161,27 @@ extension NSReviewUtility {
     }
 }
 
-@available(iOS 14.0, *)
 extension SKStoreReviewController {
     public static func askForReview() {
         DispatchQueue.main.async {
+            #if os(iOS)
             guard let scene = UIApplication.shared.foregroundActiveScene else { return }
             SKStoreReviewController.requestReview(in: scene)
+            #else
+            SKStoreReviewController.requestReview()
+            #endif
         }
     }
 }
 
+#if os(iOS)
 extension UIApplication {
     var foregroundActiveScene: UIWindowScene? {
         connectedScenes
             .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
     }
 }
+#endif
 
 extension Bundle {
     var releaseVersionNumber: String {
@@ -188,7 +194,6 @@ extension Bundle {
 }
 
 public protocol ReviewUtilityLoggable: AnyObject {
-    
     func log(_ message: String)
 }
 
@@ -200,8 +205,7 @@ extension Calendar {
     }
 }
 
-extension UIApplication {
-    
+extension Application {
     var isRunningInTestFlightEnvironment: Bool {
         if isSimulator {
             return false
