@@ -9,8 +9,8 @@ typealias Application = NSApplication
 public class NSReviewUtility: ObservableObject {
     @Published public private(set) var canAskForReview = false
     
-    public var happinessIndexCheckCount = 5 { didSet { evaluateCanAskForReview() } }
-    public var daysAfterFirstLaunchCheckCount = 3 { didSet { evaluateCanAskForReview() } }
+    public var happinessIndexCheckCount = 5
+    public var daysAfterFirstLaunchCheckCount = 3
 
     private var isDateDaysAfterFirstLaunchCheckCount: Bool {
         if let firstLaunchDate = firstLaunchDate {
@@ -36,8 +36,6 @@ public class NSReviewUtility: ObservableObject {
             firstLaunchDate = Date()
             loggingAdapter?.log("⭐️ ReviewUtility started for the first time. Setting first launched date to now.")
         }
-        
-        evaluateCanAskForReview()
     }
     
     public func setLoggingAdapter(_ loggingAdapter: ReviewUtilityLoggable) {
@@ -67,14 +65,14 @@ public class NSReviewUtility: ObservableObject {
     
     public func incrementHappiness() {
         happinessIndex += 1
-        loggingAdapter?.log("⭐️ Incremeting happiness, index is now: \(happinessIndex)")
+        loggingAdapter?.log("⭐️ Incrementing happiness, index is now: \(happinessIndex)")
         evaluateCanAskForReview()
     }
     
     public func decrementHappiness() {
         if happinessIndex > 0 {
             happinessIndex -= 1
-            loggingAdapter?.log("⭐️ Decremeting happiness, index is now: \(happinessIndex)")
+            loggingAdapter?.log("⭐️ Decrementing happiness, index is now: \(happinessIndex)")
         } else {
             loggingAdapter?.log("⭐️ Can not decrement happiness because it is already \(happinessIndex)")
         }
@@ -88,10 +86,7 @@ public class NSReviewUtility: ObservableObject {
     public func askForReview(force: Bool = false) {
         let askForReviewClosure = { [weak self] in
             guard let self = self else { return }
-            // Only save when in production
-            if Application.shared.isRunningInAppStoreEnvironment {
-                self.recordAskForReview()
-            }
+            self.recordAskForReview()
             SKStoreReviewController.askForReview()
             self.loggingAdapter?.log("⭐️ Asked for review now")
         }
@@ -202,60 +197,5 @@ extension Calendar {
     
     func isDateInThisYear(_ date: Date) -> Bool {
         return isDate(date, equalTo: currentDate, toGranularity: .year)
-    }
-}
-
-extension Application {
-    var isRunningInTestFlightEnvironment: Bool {
-        if isSimulator {
-            return false
-        } else {
-            if isAppStoreReceiptSandbox && !hasEmbeddedMobileProvision {
-                return true
-            } else {
-                return false
-            }
-        }
-    }
-    
-    var isRunningInAppStoreEnvironment: Bool {
-        if isSimulator {
-            return false
-        } else {
-            if isAppStoreReceiptSandbox || hasEmbeddedMobileProvision {
-                return false
-            } else {
-                return true
-            }
-        }
-    }
-
-    private var hasEmbeddedMobileProvision: Bool {
-        guard Bundle.main.path(forResource: "embedded", ofType: "mobileprovision") == nil else {
-            return true
-        }
-        return false
-    }
-    
-    private var isAppStoreReceiptSandbox: Bool {
-        if isSimulator {
-            return false
-        } else {
-            guard let url = Bundle.main.appStoreReceiptURL else {
-                return false
-            }
-            guard url.lastPathComponent == "sandboxReceipt" else {
-                return false
-            }
-            return true
-        }
-    }
-    
-    private var isSimulator: Bool {
-        #if arch(i386) || arch(x86_64)
-        return true
-        #else
-        return false
-        #endif
     }
 }
