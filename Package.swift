@@ -1,9 +1,12 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.9
 import PackageDescription
 
 let package = Package(
     name: "NSReviewUtility",
-    platforms: [.iOS(.v14), .macOS(.v11)],
+    platforms: [.iOS(.v16), .macOS(.v13)],
     products: [.library(name: "NSReviewUtility", targets: ["NSReviewUtility"])],
-    targets: [.target(name: "NSReviewUtility")]
+    targets: [
+        .target(name: "NSReviewUtility"),
+        .testTarget(name: "NSReviewUtilityTests", dependencies: ["NSReviewUtility"]),
+    ]
 )
