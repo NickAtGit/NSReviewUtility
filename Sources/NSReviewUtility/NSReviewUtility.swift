@@ -11,23 +11,17 @@ typealias Application = NSApplication
 /// The remote-tunable rules that decide whether a review prompt may be shown.
 /// Owned by the host app's config layer and pushed in via `configure(with:)`.
 public struct ReviewPromptPolicy: Equatable, Sendable {
-    public var isEnabled: Bool
     public var happinessThreshold: Int
     public var daysAfterFirstLaunch: Int
-    public var maxPromptsPerYear: Int
 
-    public init(isEnabled: Bool, happinessThreshold: Int, daysAfterFirstLaunch: Int, maxPromptsPerYear: Int) {
-        self.isEnabled = isEnabled
+    public init(happinessThreshold: Int, daysAfterFirstLaunch: Int) {
         self.happinessThreshold = happinessThreshold
         self.daysAfterFirstLaunch = daysAfterFirstLaunch
-        self.maxPromptsPerYear = maxPromptsPerYear
     }
 
     public static let `default` = ReviewPromptPolicy(
-        isEnabled: true,
         happinessThreshold: 3,
-        daysAfterFirstLaunch: 3,
-        maxPromptsPerYear: 3
+        daysAfterFirstLaunch: 3
     )
 }
 
@@ -43,7 +37,6 @@ public enum HappinessRequirement: Sendable {
 }
 
 public enum ReviewPromptDenial: String, Sendable {
-    case disabledByPolicy
     case tooSoonAfterFirstLaunch
     case notHappyEnough
     case alreadyAskedThisVersion
@@ -64,7 +57,7 @@ public enum ReviewPromptEligibility: Equatable, Sendable {
 /// The whole "shown once" guarantee rests on `claimPrompt`: it evaluates eligibility and records the
 /// prompt as shown in one synchronous step, so two triggers racing at the same moment cannot both
 /// present. Recording happens at presentation, not at outcome, which is what makes the yearly cap
-/// actually count every card the user saw (including the ones they just dismissed).
+/// count every card the user saw (including the ones they just dismissed).
 ///
 /// Call `claimPrompt`, `configure` and the happiness mutators from the main thread; every real caller
 /// already is (scan services, view actions, presentation code). Only the `@Published` mirror is
@@ -84,6 +77,9 @@ public final class NSReviewUtility: ObservableObject {
     static let notAskedSentinel = "not asked yet"
     private static let maxStoredDates = 12
     private static let storageVersion = 1
+    /// Mirrors Apple's own cap of 3 `SKStoreReviewController` prompts per year. Hardcoded rather than
+    /// remote-configurable: there is no reason to ask more often than Apple will actually surface.
+    private static let maxPromptsPerYear = 3
 
     public init(
         defaults: UserDefaults = .standard,
@@ -117,7 +113,7 @@ public final class NSReviewUtility: ObservableObject {
     /// and can no longer fire a prompt on its own.
     public func configure(with policy: ReviewPromptPolicy) {
         self.policy = policy
-        loggingAdapter?.log("⭐️ ReviewUtility configured: enabled=\(policy.isEnabled), happinessThreshold=\(policy.happinessThreshold), daysAfterFirstLaunch=\(policy.daysAfterFirstLaunch), maxPerYear=\(policy.maxPromptsPerYear)")
+        loggingAdapter?.log("⭐️ ReviewUtility configured: happinessThreshold=\(policy.happinessThreshold), daysAfterFirstLaunch=\(policy.daysAfterFirstLaunch)")
         refresh()
     }
 
@@ -148,9 +144,8 @@ public final class NSReviewUtility: ObservableObject {
     // MARK: Eligibility & claiming
 
     public func eligibility(happiness: HappinessRequirement = .threshold) -> ReviewPromptEligibility {
-        guard policy.isEnabled else { return .denied(.disabledByPolicy) }
         guard versionLastAskedForReview != currentVersion else { return .denied(.alreadyAskedThisVersion) }
-        guard promptsThisYear < policy.maxPromptsPerYear else { return .denied(.yearlyCapReached) }
+        guard promptsThisYear < Self.maxPromptsPerYear else { return .denied(.yearlyCapReached) }
         guard isPastFirstLaunchDelay else { return .denied(.tooSoonAfterFirstLaunch) }
         guard meetsHappiness(happiness) else { return .denied(.notHappyEnough) }
         return .eligible
@@ -188,9 +183,9 @@ public final class NSReviewUtility: ObservableObject {
     /// has disabled in-app reviews in Settings, or Apple's own cap is hit, and none of those are
     /// detectable. So the native prompt gets a single shot per calendar year: the first "rate" tap
     /// spends it, and every later tap falls through to the App Store instead of silently doing nothing.
-    /// Deliberately independent of `maxPromptsPerYear`, which caps how often the *card* is shown, not
-    /// how many native prompts a user may trigger. This also means repeated taps cannot keep burning
-    /// quota: once the single yearly request is recorded, `handleRateTapped` stops asking for it.
+    /// Deliberately independent of the `maxPromptsPerYear` card cap, which limits how often the *card*
+    /// is shown, not how many native prompts a user may trigger. This also means repeated taps cannot
+    /// keep burning quota: once the single yearly request is recorded, `handleRateTapped` stops asking.
     public var hasNativePromptQuota: Bool {
         nativeRequestsThisYear == 0
     }

@@ -64,25 +64,15 @@ struct EligibilityTests {
         defaults.set(clock.date, forKey: "firstLaunchDate")  // launched right now
         let utility = NSReviewUtility(defaults: defaults, now: clock.now, currentVersion: "1.0.0-1")
         utility.start()
-        utility.configure(with: ReviewPromptPolicy(isEnabled: true, happinessThreshold: 3, daysAfterFirstLaunch: 3, maxPromptsPerYear: 3))
+        utility.configure(with: ReviewPromptPolicy(happinessThreshold: 3, daysAfterFirstLaunch: 3))
         for _ in 0..<10 { utility.incrementHappiness() }
         #expect(utility.eligibility() == .denied(.tooSoonAfterFirstLaunch))
-    }
-
-    @Test("Kill switch denies with disabledByPolicy")
-    func killSwitch() {
-        let clock = Clock(date("2026-06-01T12:00:00Z"))
-        let (utility, _) = makeUtility(clock: clock)
-        for _ in 0..<3 { utility.incrementHappiness() }
-        utility.configure(with: ReviewPromptPolicy(isEnabled: false, happinessThreshold: 3, daysAfterFirstLaunch: 3, maxPromptsPerYear: 3))
-        #expect(utility.eligibility() == .denied(.disabledByPolicy))
-        #expect(utility.canAskForReview == false)  // config re-evaluated without any happiness event
     }
 
     @Test("Happiness requirement matrix")
     func happinessMatrix() {
         let clock = Clock(date("2026-06-01T12:00:00Z"))
-        let (utility, _) = makeUtility(clock: clock, policy: ReviewPromptPolicy(isEnabled: true, happinessThreshold: 3, daysAfterFirstLaunch: 3, maxPromptsPerYear: 3))
+        let (utility, _) = makeUtility(clock: clock, policy: ReviewPromptPolicy(happinessThreshold: 3, daysAfterFirstLaunch: 3))
         // index 0
         #expect(utility.eligibility(happiness: .ignored) == .eligible)
         #expect(utility.eligibility(happiness: .anyPositive) == .denied(.notHappyEnough))
@@ -157,6 +147,7 @@ struct ClaimingTests {
 struct YearlyCapTests {
     @Test("Three prompts across versions, fourth blocked, resets next year")
     func capBindsAndResets() {
+        // The cap is hardcoded to 3 (mirrors Apple's own yearly prompt limit), not configurable.
         let clock = Clock(date("2026-01-10T12:00:00Z"))
         let defaults = makeDefaults()
         defaults.set(clock.date.addingTimeInterval(-30 * 86_400), forKey: "firstLaunchDate")
